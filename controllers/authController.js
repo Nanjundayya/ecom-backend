@@ -1,5 +1,5 @@
 const bcrypt = require("bcryptjs");
-const User = require("../models/User");
+const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 
 const register = async (req, res) => {
@@ -64,6 +64,7 @@ const login = async (req, res) => {
       {
         email: user.email,
         role: user.role,
+        _id: user._id,
       },
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
@@ -93,8 +94,30 @@ const logout = (req, res) => {
     message: "Logout success",
   });
 };
+
+const verifyUser = (req, res, next) => {
+  const token = req.cookies.jwt;
+
+  if (!token) {
+    return res.status(401).json({
+      authenticated: false,
+    });
+  }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    res.status(200).json({
+      authenticated: true,
+      user: decoded,
+    });
+  } catch (err) {
+    res.status(401).json({
+      authenticated: false,
+    });
+  }
+};
 module.exports = {
   register,
   login,
   logout,
+  verifyUser,
 };
