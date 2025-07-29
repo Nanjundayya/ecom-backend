@@ -65,7 +65,7 @@ const verifyPayment = async (req, res) => {
       return res.status(400).json({ message: "Invalid signature" });
     }
     const updatedOrder = await Order.findOneAndUpdate(
-      { orderId },
+      { order },
       { paymentStatus: "paid", paymentId },
       { new: true }
     );
